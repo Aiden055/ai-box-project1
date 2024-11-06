@@ -42,5 +42,10 @@
     "postcss": "^8.4.23",
     "tailwindcss": "^3.3.1",
     "typescript": "^5.0.4"
-  }
+  },
+  "browserslist": [
+    ">0.3%",
+    "not dead",
+    "not op_mini all"
+  ]
 }
