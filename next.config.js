@@ -2,10 +2,9 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-      domains: ['hebbkx1anhila5yf.public.blob.vercel-storage.com'],
+        domains: ['hebbkx1anhila5yf.public.blob.vercel-storage.com'],
     },
-  }
-  
-  module.exports = {
-  swcMinify: false,
-};
+    swcMinify: false, // 将 swcMinify 设置为 false
+}
+
+module.exports = nextConfig;
