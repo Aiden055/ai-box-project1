@@ -4,14 +4,12 @@ const nextConfig = {
   images: {
     domains: ['hebbkx1anhila5yf.public.blob.vercel-storage.com'],
   },
-  swcMinify: false,
-  webpack: (config, { dev, isServer }) => {
-    // 仅在生产构建中应用这些优化
-    if (!dev) {
-      config.optimization.minimize = true;
-      config.optimization.minimizer = config.optimization.minimizer.map((plugin) => {
-        if (plugin.constructor.name === 'TerserPlugin') {
-          return new plugin.constructor({
+  webpack: (config, { isServer }) => {
+    // 修改 Terser 配置以更好地处理类属性和方法
+    if (!isServer) {
+      config.optimization.minimizer = config.optimization.minimizer.map(minimizer => {
+        if (minimizer.constructor.name === 'TerserPlugin') {
+          return new minimizer.constructor({
             terserOptions: {
               parse: {
                 ecma: 2020,
@@ -19,11 +17,14 @@ const nextConfig = {
               compress: {
                 ecma: 5,
                 warnings: false,
-                comparisons: false,
-                inline: 2,
+                // 禁用可能导致类属性问题的优化
+                passes: 1,
+                pure_getters: false,
               },
               mangle: {
                 safari10: true,
+                keep_classnames: true,
+                keep_fnames: true,
               },
               output: {
                 ecma: 5,
@@ -33,7 +34,7 @@ const nextConfig = {
             },
           });
         }
-        return plugin;
+        return minimizer;
       });
     }
     return config;
