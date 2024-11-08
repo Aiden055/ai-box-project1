@@ -1,4 +1,9 @@
+import '../lib/promise-polyfill'
 import './globals.css'
+import { Toaster } from 'react-hot-toast'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'AI Box',
@@ -12,7 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <Toaster position="top-center" />
+      </body>
     </html>
   )
 }
