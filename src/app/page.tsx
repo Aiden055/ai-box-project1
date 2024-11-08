@@ -530,23 +530,41 @@ export default function Home() {
     setShowConfirmDialog(false)
   }
 
-  const toggleEditMode = () => {
-    if (currentUser && currentUser.user_metadata.is_developer) {
+  const checkIsDeveloper = async () => {
+  const { data, error } = await supabase
+    .from('current_user_is_developer')
+    .select('is_developer')
+    .single();
+    
+  if (error) {
+    console.error('Error checking developer status:', error);
+    return false;
+  }
+  
+  return data?.is_developer || false;
+};
+  
+  const toggleEditMode = async () => {
+  if (!currentUser) return;
+
+  const isDeveloper = await checkIsDeveloper();
+  
+  if (isDeveloper) {
     if (editMode && hasUnsavedChanges) {
       if (window.confirm("您有未保存的更改。是否确定要退出编辑模式？")) {
-        setEditMode(false)
-        setHasUnsavedChanges(false)
+        setEditMode(false);
+        setHasUnsavedChanges(false);
       }
     } else {
-      setEditMode(prevMode => !prevMode)
+      setEditMode(prevMode => !prevMode);
     }
-    setIsHeaderImageCropping(false)
-    setCurrentEditingTool(null)
-    setImageAdjustmentMode(null)
+    setIsHeaderImageCropping(false);
+    setCurrentEditingTool(null);
+    setImageAdjustmentMode(null);
   } else {
-    toast.error("只有开发者可以进入编辑模式")
+    toast.error("只有开发者可以进入编辑模式");
   }
-}
+};
 
   const toggleImageAdjustmentMode = (categoryIndex: number, toolIndex: number) => {
     if (imageAdjustmentMode && 
