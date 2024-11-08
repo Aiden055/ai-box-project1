@@ -531,20 +531,22 @@ export default function Home() {
   }
 
   const toggleEditMode = () => {
-    if (currentUser) {
-      if (editMode && hasUnsavedChanges) {
-        if (window.confirm("您有未保存的更改。是否确定要退出编辑模式？")) {
-          setEditMode(false)
-          setHasUnsavedChanges(false)
-        }
-      } else {
-        setEditMode(prevMode => !prevMode)
+    if (currentUser && currentUser.user_metadata.is_developer) {
+    if (editMode && hasUnsavedChanges) {
+      if (window.confirm("您有未保存的更改。是否确定要退出编辑模式？")) {
+        setEditMode(false)
+        setHasUnsavedChanges(false)
       }
-      setIsHeaderImageCropping(false)
-      setCurrentEditingTool(null)
-      setImageAdjustmentMode(null)
+    } else {
+      setEditMode(prevMode => !prevMode)
     }
+    setIsHeaderImageCropping(false)
+    setCurrentEditingTool(null)
+    setImageAdjustmentMode(null)
+  } else {
+    toast.error("只有开发者可以进入编辑模式")
   }
+}
 
   const toggleImageAdjustmentMode = (categoryIndex: number, toolIndex: number) => {
     if (imageAdjustmentMode && 
@@ -822,25 +824,25 @@ export default function Home() {
             {currentUser ? (
               <>
                 <span className="text-sm text-gray-600">欢迎，{currentUser.email}</span>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={toggleEditMode}
-                        variant={editMode ? "default" : "outline"}
-                        size="sm"
-                        className="flex items-center"
-                      >
-                        {editMode ? <X className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                        {editMode ? "退出编辑" : "编辑模式"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{editMode ? "退出编辑模式" : "进入编辑模式"}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                {editMode && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={toggleEditMode}
+                          variant={editMode ? "default" : "outline"}
+                          size="sm"
+                          className="flex items-center"
+                        >
+                          {editMode ? <X className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
+                          {editMode ? "退出编辑" : "编辑模式"}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{editMode ? "退出编辑模式" : "进入编辑模式"}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                   <>
                     <TooltipProvider>
                       <Tooltip>
