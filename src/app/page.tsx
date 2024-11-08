@@ -1495,4 +1495,4 @@ export default function Home() {
       <Toaster position="top-center" />
     </div>
   )
-}
+}}
