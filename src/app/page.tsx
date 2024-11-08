@@ -193,9 +193,17 @@ export default function Home() {
         password: registerPassword,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Registration error:', error);
+        if (error.message.includes('not authorized')) {
+          toast.error('此邮箱地址不被允许注册。请联系管理员或使用其他邮箱。');
+        } else {
+          toast.error(`注册失败: ${error.message}`);
+        }
+        return;
+      }
 
-      toast.success('注册成功。请检查您的邮箱以验证账户。')
+      toast.success('注册成功。请检查您的邮箱以验证账户。');
       setShowRegisterDialog(false)
       setRegisterEmail("")
       setRegisterPassword("")
@@ -252,13 +260,30 @@ export default function Home() {
       return;
     }
 
+    if (!currentUser) {
+      toast.error('请先登录');
+      return;
+    }
+
     try {
+      console.log('Attempting to add category with user:', currentUser.email);
+      
       const { data, error } = await supabase
         .from('categories')
-        .insert({ title: newCategoryTitle, tools: [] })
+        .insert({ 
+          title: newCategoryTitle, 
+          tools: [],
+          created_by: currentUser.id  // Add user ID to track ownership
+        })
         .select();
 
       if (error) {
+        console.error('Supabase error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
 
@@ -275,11 +300,13 @@ export default function Home() {
       if (error instanceof Error) {
         if (error.message.includes('duplicate key')) {
           toast.error('该分类名称已存在，请使用不同的名称');
-        } else if (error.message.includes('permission denied')) {
-          toast.error('您没有权限添加新分类');
-        } else {
-          toast.error(`添加分类失败: ${error.message}`);
-        }
+        } else if (error.message.includes('permission denied') || error.message.includes('not authorized')) {
+          toast.error('权限不足，请确认您已登录并具有相应权限');
+          console.log('Current auth status:', { 
+            isLoggedIn: !!currentUser,
+            userId: currentUser?.id,
+            userEmail: currentUser?.email
+          });
       } else {
         toast.error('添加分类失败，请稍后重试');
       }
